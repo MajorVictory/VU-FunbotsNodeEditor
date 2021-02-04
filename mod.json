@@ -1,0 +1,12 @@
+{
+	"Name": "VU-FunbotsNodeEditor",
+	"Authors": ["MajorVictory87"],
+	"Description": "A test mod for editing path nodes for the fun-bots mod",
+	"URL": "",
+	"Version": "0.1",
+	"Tags": [],
+	"HasVeniceEXT": true,
+	"Dependencies": {
+		"veniceext": ">=1.0.8"
+	}
+}
