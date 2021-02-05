@@ -2,6 +2,7 @@ class "NodeCollection"
 
 function NodeCollection:__init()
 	self.waypointIDs = 0
+	self.waypoints = {}
 	self.waypointsByID = {}
 	self.waypointsByIndex = {}
 end
@@ -13,7 +14,8 @@ function NodeCollection:CreateWaypoint(vec3Position, pathIndex, inputVar)
 		Index = newIndex,
 		Position = vec3Position,
 		PathIndex = pathIndex,
-		InputVar = inputVar
+		InputVar = inputVar,
+		Distance = nil
 	}
 	self:Add(waypoint)
 	return waypoint
@@ -22,20 +24,31 @@ end
 function NodeCollection:Add(waypoint)
 	self.waypointsByID[waypoint.ID] = waypoint
 	self.waypointsByIndex[waypoint.Index] = waypoint
+	table.insert(self.waypoints, waypoint)
 end
 
 function NodeCollection:Remove(waypoint)
 	self.waypointsByID[waypoint.ID] = nil
 	self.waypointsByIndex[waypoint.Index] = nil
+	local eraseIndex = nil
+	for i = 1, #self.waypoints do
+		if (self.waypoints[i].ID == waypoint.ID) then
+			eraseIndex = i
+		end
+	end
+	if (eraseIndex ~= nil) then
+		table.remove(self.waypoints, eraseIndex)
+	end
 end
 
 function NodeCollection:Clear()
+	self.waypoints = {}
 	self.waypointsByID = {}
 	self.waypointsByIndex = {}
 end
 
 function NodeCollection:GetWaypoints()
-	return self.waypointsByID
+	return self.waypoints
 end
 
 function NodeCollection:Load(mapName)
@@ -69,7 +82,11 @@ function NodeCollection:Load(mapName)
 end
 
 function NodeCollection:PreviousWaypoint(currentWaypoint)
-	return self.waypointsByIndex[currentWaypoint.Index-1]
+	local previousWaypoint = self.waypointsByIndex[currentWaypoint.Index-1]
+	if (previousWaypoint ~= nil and previousWaypoint.PathIndex == currentWaypoint.PathIndex) then
+		return previousWaypoint
+	end
+	return nil
 end
 
 function NodeCollection:Find(vec3Position, tolerance)
